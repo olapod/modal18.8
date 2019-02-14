@@ -1,6 +1,7 @@
 var GIPHY_API_URL = 'https://api.giphy.com';
 var GIPHY_PUB_KEY = 'SIGf5ZISEVrGRbkUIS5UH4m56axoRuVR';
 
+
 App = React.createClass({
 
   getInitialState() {
@@ -46,21 +47,55 @@ handleSearch: function(searchingText) {  // 1.
   }.bind(this));
 },
 
-getGif: function(searchingText, callback) {  // 1.
-  var url = GIPHY_API_URL + '/v1/gifs/random?api_key=' + GIPHY_PUB_KEY + '&tag=' + searchingText;  // 2.
-  var xhr = new XMLHttpRequest();  // 3.
-  xhr.open('GET', url);
-  xhr.onload = function() {
-      if (xhr.status === 200) {
-         var data = JSON.parse(xhr.responseText).data; // 4.
-          var gif = {  // 5.
-              url: data.fixed_width_downsampled_url,
-              sourceUrl: data.url
-          };
-          callback(gif);  // 6.
-      }
-  };
-  xhr.send();
-}
+// getGif: function(searchingText, callback) {  // 1.
+//   var url = GIPHY_API_URL + '/v1/gifs/random?api_key=' + GIPHY_PUB_KEY + '&tag=' + searchingText;  // 2.
+//   var xhr = new XMLHttpRequest();  // 3.
+//   xhr.open('GET', url);
+//   xhr.onload = function() {
+//       if (xhr.status === 200) {
+//          var data = JSON.parse(xhr.responseText).data; // 4.
+//           var gif = {  // 5.
+//               url: data.fixed_width_downsampled_url,
+//               sourceUrl: data.url
+//           };
+//           callback(gif);  // 6.
+//       }
+//   };
+//   xhr.send();
+// }
 
+
+getGif: function(url) {
+     
+  return new Promise(
+    function(resolve, reject) {
+        const request = new XMLHttpRequest();
+        request.onload = function() {
+            if (this.status === 200) {
+                resolve(this.response); // Sukces
+            } else {
+                reject(new Error(this.statusText)); // Dostaliśmy odpowiedź, ale jest to np 404
+            }
+        };
+        request.onerror = function() {
+            reject(new Error(
+               `XMLHttpRequest Error: ${this.statusText}`));
+        };
+        request.open('GET', url);
+        request.send();
+    });
+},
 });
+
+getGif(url)
+  .then(response => {
+    var url = GIPHY_API_URL + '/v1/gifs/random?api_key=' + GIPHY_PUB_KEY + '&tag=' + searchingText;
+    JSON.parse(xhr.responseText).response; 
+    var gif = {  
+        url: data.fixed_width_downsampled_url,
+        sourceUrl: data.url
+       };
+  })
+
+
+  
