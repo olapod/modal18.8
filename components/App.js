@@ -65,37 +65,48 @@ handleSearch: function(searchingText) {  // 1.
 // }
 
 
-getGif: function(url) {
-     
-  return new Promise(
-    function(resolve, reject) {
-        const request = new XMLHttpRequest();
-        request.onload = function() {
-            if (this.status === 200) {
-                resolve(this.response); // Sukces
-            } else {
-                reject(new Error(this.statusText)); // Dostaliśmy odpowiedź, ale jest to np 404
-            }
-        };
-        request.onerror = function() {
-            reject(new Error(
-               `XMLHttpRequest Error: ${this.statusText}`));
-        };
-        request.open('GET', url);
-        request.send();
-    });
-},
+
+getGif: function() {
+  console.log('Updating State', 'primary');
+        
+  function httpRequestGif(url) {
+    return new Promise(
+        function(resolve, reject) {
+            const url = GIPHY_API_URL + '/v1/gifs/random?api_key=' + GIPHY_PUB_KEY + '&tag=' + searchingText;
+            const request = new XMLHttpRequest();
+            request.open('GET', url);
+            request.onload = function() {
+                if (this.status === 200) {
+                  resolve(this.response); 
+                  console.log("request finished and response is ready");
+                  console.log(this.response);
+                  
+                } else {
+                    reject(new Error(this.statusText)); 
+                }
+            };
+            request.onerror = function() {
+                reject(new Error(
+                   `XMLHttpRequest Error: ${this.statusText}`));
+            };
+            
+            request.send();
+        });
+  }
+  
+    httpRequestGif(url)
+    .then(response => {
+      const data = JSON.parse(xhr.responseText).data; 
+      const gif = { 
+                  url: data.fixed_width_downsampled_url,
+                  sourceUrl: data.url
+                };
+      // callback(gif)????
+    })
+  }
 });
 
-getGif(url)
-  .then(response => {
-    var url = GIPHY_API_URL + '/v1/gifs/random?api_key=' + GIPHY_PUB_KEY + '&tag=' + searchingText;
-    JSON.parse(xhr.responseText).response; 
-    var gif = {  
-        url: data.fixed_width_downsampled_url,
-        sourceUrl: data.url
-       };
-  })
+
 
 
   
