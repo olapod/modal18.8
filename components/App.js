@@ -34,17 +34,26 @@ App = React.createClass({
     );
 },
 
-handleSearch: function(searchingText) {  // 1.
+handleSearch: function(searchingText) {  
   this.setState({
-    loading: true  // 2.
+    loading: true  
   });
-  this.getGif(searchingText, function(gif) {  // 3.
-    this.setState({  // 4
-      loading: false,  // a
-      gif: gif,  // b
-      searchingText: searchingText  // c
+  
+  this.getGif(searchingText) 
+  .then(
+    (response) => {
+      const data = JSON.parse(response).data; 
+      const gif = { 
+        url: data.fixed_width_downsampled_url,
+        sourceUrl: data.url
+      }; 
+
+    this.setState({ 
+      loading: false,  
+      gif: gif,  
+      searchingText: searchingText  
     });
-  }.bind(this));
+  })
 },
 
 // getGif: function(searchingText, callback) {  // 1.
@@ -66,10 +75,9 @@ handleSearch: function(searchingText) {  // 1.
 
 
 
-getGif: function() {
+getGif: function(searchingText) {
   console.log('Updating State', 'primary');
         
-  function httpRequestGif(url) {
     return new Promise(
         function(resolve, reject) {
             const url = GIPHY_API_URL + '/v1/gifs/random?api_key=' + GIPHY_PUB_KEY + '&tag=' + searchingText;
@@ -92,20 +100,10 @@ getGif: function() {
             
             request.send();
         });
-  }
-  
-    httpRequestGif(url)
-    .then(response => {
-      const data = JSON.parse(xhr.responseText).data; 
-      const gif = { 
-                  url: data.fixed_width_downsampled_url,
-                  sourceUrl: data.url
-                };
-      // callback(gif)????
-    })
-  }
+    }
 });
-
+  
+ 
 
 
 
